@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 注册用户某块
+    'df_user',
 ]
 
 MIDDLEWARE = [
@@ -77,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ttsx',
-        'UESR': 'root',
-        'PSAAWORD': 'root',
+        'USER': 'root',
+        'PASSWORD':'root',
         'HOST': '192.168.163.135',
         'PORT': '3306',
     }

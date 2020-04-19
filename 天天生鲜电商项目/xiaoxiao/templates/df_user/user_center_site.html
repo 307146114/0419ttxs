@@ -1,0 +1,94 @@
+{% extends "df_user/base.html" %}
+{% block head %}
+    <script src="/static/js/jquery-1.12.4.min.js"></script>
+    <script>
+        $(function(){
+            var tel  = $('#tel').html();
+            var re  = /^(\d{3})\d{4}(\d{4})$/;
+
+            tel = tel.replace(re,"$1****$2");
+            if($("#showname").html().trim().length>0){
+                $("#showname").html("("+$("#showname").html().trim()+"收)")
+            }
+
+            $('#tel').html(tel);
+            $('#name').val($('#name').val().trim());
+            $('#adress').html($('#adress').val().trim());
+            $('#youbian').val($('#youbian').val().trim());
+            $('#edittel').val($('#edittel').val().trim());
+            $("#submit").click(function () {
+                var name = $('#name').val();
+                if(!(name.length>1 && name.length<=20)){
+                    {#验证名称位数#}
+                    alert('请输入20位以内收件人名称');
+                    return false;
+                }
+                var adress = $('#adress').val();
+                if(!(adress.length>1 && adress.length<=100)){
+                    {#验证地址位数#}
+                    alert('请输入100位以内地址');
+                    return false;
+                }
+                var youbian = $('#youbian').val();
+                if(youbian.length!=6){
+                    {#验证邮编位数#}
+                    alert('邮编位数不对');
+                    return false;
+                }
+                var edittel = $('#edittel').val();
+                if(edittel.length !=11){
+                    {#验证手机号位数#}
+                    alert('请输入正确的手机号');
+                    return false;
+                }
+
+            })
+
+        })
+    </script>
+{% endblock head %}
+{% block bodytop %}
+    <div class="main_con clearfix">
+		<div class="left_menu_con clearfix">
+			<h3>用户中心</h3>
+			<ul>
+				<li><a href="user_center_info">· 个人信息</a></li>
+				<li><a href="user_center_order">· 全部订单</a></li>
+				<li><a href="user_center_site" class="active">· 收货地址</a></li>
+			</ul>
+		</div>
+		<div class="right_content clearfix">
+				<h3 class="common_title2">收货地址</h3>
+				<div class="site_con">
+					<dl>
+						<dt>当前地址：</dt>
+						<dd>{{user.adress}} <span id="showname">{{ user.name }}</span> <span id="tel">{{ user.tel }}</span></dd>
+					</dl>					
+				</div>
+				<h3 class="common_title2">编辑地址</h3>
+				<div class="site_con">
+					<form action="editUesr" method="post">
+                        {% csrf_token %}
+						<div class="form_group">
+							<label>收件人：</label>
+							<input type="text" name="name" id="name" value="{{ user.name }} ">
+						</div>
+						<div class="form_group form_group2">
+							<label>详细地址：</label>
+							<textarea class="site_area" id="adress" name="adress" >{{user.adress}}</textarea>
+						</div>
+						<div class="form_group">
+							<label>邮编：</label>
+							<input type="text" name="youbian" id="youbian" value="{{user.youbian}}">
+						</div>
+						<div class="form_group">
+							<label>手机：</label>
+							<input type="number" name="tel" id="edittel" value="{{user.tel}}">
+						</div>
+
+						<input type="submit" id="submit" value="提交" class="info_submit">
+					</form>
+				</div>
+		</div>
+	</div>
+{% endblock bodytop %}
