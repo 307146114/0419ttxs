@@ -7,7 +7,7 @@ from hashlib import sha1
 
 def register(request):
     # 注册请求页面
-    return  render(request,'df_user/register.html')
+    return  render(request,'df_user/register.html',{'title':'天天生鲜 - 注册'})
 def register_username(request):
     # 验证账号
     username = request.GET.get('username')
@@ -38,7 +38,7 @@ def register_handle(request):
 
 def login(request):
     # 登录请求页面
-    return render(request,'df_user/login.html')
+    return render(request,'df_user/login.html',{'title':'天天生鲜 - 登录'})
 def login_handle(request):
     # 登录页面
     post = request.POST
@@ -60,7 +60,7 @@ def login_handle(request):
         # print(post.get('remembername',0))
         request.session["user_id"] = user_Db[0].id
         request.session["user_name"] = user_Db[0].username
-        context ={'user':user_Db[0]}
+        context ={'user':user_Db[0],'title':'天天生鲜 - 用户中心'}
         rendersucess = render(request, "df_user/user_center_info.html",context)
         print(username)
         if post.get('remembername',0) == '1':
@@ -81,20 +81,20 @@ def user_center_info(request):
     # print(uid)
     if uid != None:
         user_Db = UserInfo.objects.filter(pk=uid)
-        return render(request,"df_user/user_center_info.html",{'user':user_Db[0]})
+        return render(request,"df_user/user_center_info.html",{'user':user_Db[0],'title':'天天生鲜 - 用户中心'})
     else:
         return  HttpResponseRedirect('/user/login')
 
 def user_center_order(request):
      # 用户订单请求页面
-     return render(request,"df_user/user_center_order.html")
+     return render(request,"df_user/user_center_order.html",{'title':'天天生鲜 - 用户订单'})
 
 def user_center_site(request):
     # 修改收或地址请求页面
     uid = request.session["user_id"]
     user_Db = UserInfo.objects.filter(pk=uid)
 
-    return render(request,"df_user/user_center_site.html",{'user':user_Db[0]})
+    return render(request,"df_user/user_center_site.html",{'user':user_Db[0],'title':'天天生鲜 - 收货地址'})
 
 def editUesr(request):
     post = request.POST
