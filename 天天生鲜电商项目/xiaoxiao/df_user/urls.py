@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^user_center_order$',views.user_center_order),#跳转用户订单
     url(r'^user_center_site$',views.user_center_site),#跳转收货地址
     url(r'^editUesr$',views.editUesr),#修改收货地址请求
+    url(r'^logout$',views.logout),#修改收货地址请求
 
 ]

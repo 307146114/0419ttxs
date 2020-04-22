@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from df_goods.models import *
 from django.core.paginator import Paginator
+from django.http import  HttpResponseRedirect
 # Create your views here.
 
 def index(request,*args):
@@ -50,15 +51,35 @@ def index(request,*args):
 
 def detail(request):
     # 商品单页
-    goodsid = request.GET.get("goods_id")
-    goods = GoodsInfo.objects.get(pk=goodsid)
-    context = {
-        'pagetyep': 1,
-        'titile': '天天生鲜 - '+goods.gtitle,
-        'goods': goods,
-    }
-    return render(request, 'df_goods/detail.html', context)
+    try:
+        goodsid = request.GET.get("goods_id")
+        goods = GoodsInfo.objects.get(pk=goodsid)
+        # 浏览量+1
+        goods.gclick = int(goods.gclick)+1
+        goods.save()
+        context = {
+            'pagetyep': 1,
+            'titile': '天天生鲜 - ' + goods.gtitle,
+            'goods': goods,
+        }
+        red = render(request, 'df_goods/detail.html', context)
+        goods_ids = request.COOKIES.get("goods_ids", "")
+        if goods_ids != "":
+            goods_id_list = goods_ids.split(",")
+            if goods_id_list.count(str(goods.id))>=1:
+                goods_id_list.remove(str(goods.id))
+            goods_id_list.insert(0,str(goods.id))
+            if len(goods_id_list)>=6:
+                del goods_id_list[5]
 
+            print(goods_id_list)
+            red.set_cookie("goods_ids", ','.join(goods_id_list))
+            return red
+        else:
+            red.set_cookie("goods_ids",goods.id)
+            return red
+    except Exception:
+        return HttpResponseRedirect("/")
 def list(request):
     # 商品列表
     # 获取物品类别id
