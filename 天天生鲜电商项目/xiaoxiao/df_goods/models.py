@@ -16,7 +16,7 @@ class GoodsInfo(models.Model):      #商品信息
     gtitle = models.CharField('商品名称', max_length=20,db_column='标题')
     gpic = models.ImageField('商品图片',upload_to='df_goods',db_column='图片位置')      #商品图片
     gprice = models.DecimalField('商品价格',max_digits=5, decimal_places=2,db_column='价格')        #总共最多有7位,小数占2位
-    gunit = models.CharField('商品单位',max_length=20, default='500g',db_column='党委')     #商品的单位
+    gunit = models.CharField('商品单位',max_length=20, default='500g',db_column='单位')     #商品的单位
     gclick = models.IntegerField('点击量',db_column='点击数量')          #商品点击量,便于排人气
     isDelete = models.BooleanField('是否删除',default=False,db_column='是否删除')
     gjianjie = HTMLField('简介',db_column='简介')     #商品简介

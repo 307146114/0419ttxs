@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block bodytop %}
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>	
+				<span></span>			
+				<ul class="subnav">
+					<li><a href="#" class="fruit">新鲜水果</a></li>
+					<li><a href="#" class="seafood">海鲜水产</a></li>
+					<li><a href="#" class="meet">猪牛羊肉</a></li>
+					<li><a href="#" class="egg">禽类蛋品</a></li>
+					<li><a href="#" class="vegetables">新鲜蔬菜</a></li>
+					<li><a href="#" class="ice">速冻食品</a></li>
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="breadcrumb">
+		<a href="#">全部分类</a>
+		<span>></span>
+		<a href="#">新鲜水果</a>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					<li>
+						<a href="#"><img src="/static/images/goods/goods001.jpg"></a>
+						<h4><a href="#">进口柠檬</a></h4>
+						<div class="prize">￥3.90</div>
+					</li>
+					<li>
+						<a href="#"><img src="/static/images/goods/goods002.jpg"></a>
+						<h4><a href="#">玫瑰香葡萄</a></h4>
+						<div class="prize">￥16.80</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<div class="sort_bar">
+				<a href="#" class="active">默认</a>
+				<a href="#">价格</a>
+				<a href="#">人气</a>
+			</div>
+            <ul class="goods_type_list clearfix">
+                {% for foo in page %}
+                    <li>
+                        <a href="/detail?goods_id={{ foo.id }}"><img src="/static/{{ foo.gpic }}"></a>
+                        <h4><a href="/detail?goods_id={{ foo.id }}">{{ foo.gtitle }}</a></h4>
+                        <div class="operate">
+                            <span class="prize">￥{{ foo.gprize }}</span>
+                            <span class="unit">{{ foo.gprize }}/{{ foo.gunit }}</span>
+                            <a href="#" class="add_goods" title="加入购物车"></a>
+                        </div>
+                    </li>
+
+                {% endfor %}
+
+
+			</ul>
+            <script src="/static/js/jquery-1.12.4.min.js"></script>
+            <script>
+                $(function () {
+                    {#当前页数#}
+                    var page_num ={{ page.number }};
+                    {#上一页的页码#}
+                    var up_page = parseInt(page_num)-1;
+                    {#下一页的页码#}
+                    var down_page = parseInt(page_num)+1;
+                    {#下一页的页码#}
+                    {#总页数#}
+                    var total_page = {{ page.paginator.num_pages }};
+                    {#当前商品的种类#}
+                    var goodsStype = {{ goodsStype }};
+                    if (page_num==1){
+                        $('#page_up').attr("href","#");
+                    }else{
+                        $('#page_up').attr("href","/list?goodsStype="+goodsStype+"&page_num="+up_page);
+                    }
+                    if (page_num == total_page ){
+                        $('#page_down').attr("href","#")
+                    }else {
+                         $('#page_down').attr("href","/list?goodsStype="+goodsStype+"&page_num="+down_page);
+                    }
+                    if (total_page>5){
+                        if (page_num>3){
+                            var a_text = "/list?goodsStype="+goodsStype+"&page_num=1"
+
+                             {#<a href='/list?goodsStype='+goodsStype+'&page_num="1"'>首页</a>#}
+                            $('#page_up').before("<a href='"+a_text+"'>首页</a>")
+                        }
+                        if (page_num+2<total_page){
+                            var a_text = "/list?goodsStype="+goodsStype+"&page_num="+total_page
+
+                            $('#page_down').after("<a href='"+a_text+"'>尾页</a>")
+                        }
+                    }
+                })
+            </script>
+			<div class="pagenation">
+				<a href="#" id="page_up"><上一页</a>
+                {% if  page.paginator.num_pages <= 5 %}
+                    {% for page_num in page_list %}
+                        {% if forloop.counter == page.number %}
+                            <a href="#" class="active">{{ page_num}}</a>
+                        {% endif %}
+                        <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                    {% endfor %}
+                {% else %}
+                    {% for page_num in page_list %}
+                        {% if forloop.counter == page.number %}
+                            <a href="#" class="active">{{ page_num}}</a>
+                        {% endif %}
+                        {% if forloop.counter == page.number|add:2 %}
+                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                        {% endif %}
+                        {% if forloop.counter == page.number|add:1 %}
+                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                        {% endif %}
+                        {% if forloop.counter == page.number|add:-1 %}
+                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                        {% endif %}
+                        {% if forloop.counter == page.number|add:-2 %}
+                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+				<a href="#" id="page_down">下一页></a>
+			</div>
+		</div>
+	</div>
+
+{% endblock bodytop %}

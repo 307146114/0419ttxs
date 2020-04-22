@@ -1,9 +1,9 @@
 from django.shortcuts import render,redirect
-
-# Create your views here.
 from df_user.models import UserInfo
 from django.http import HttpResponse,HttpResponseRedirect
 from hashlib import sha1
+
+# Create your views here.
 
 def register(request):
     # 注册请求页面
