@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'df_goods',
     # 富文本模块
     'tinymce',
+    # 购物车模块
+    'df_cart',
 ]
 
 MIDDLEWARE = [

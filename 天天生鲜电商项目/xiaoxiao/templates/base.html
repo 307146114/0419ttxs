@@ -5,6 +5,22 @@
 	<title>{{ title }}</title>
 	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <script src="/static/js/jquery-1.12.4.min.js"></script>
+    <script>
+        function getcount(){
+            $.get('/cart/count',function (data) {
+                if (data==0){
+                    $('#show_count').hide();
+                }else{
+
+                    $('#show_count').text(data).show()
+                }
+            })
+        }
+        $(function () {
+                getcount()
+        })
+    </script>
     {% block head %}{% endblock head %}
 </head>
 <body>
@@ -31,7 +47,7 @@
 					<span>|</span>
 					<a href="/user/user_center_info">用户中心</a>
 					<span>|</span>
-					<a href="cart.html">我的购物车</a>
+					<a href="/cart">我的购物车</a>
 					<span>|</span>
 					<a href="/user/user_center_order">我的订单</a>
 				</div>
@@ -48,8 +64,8 @@
 		</div>
         {% if pagetype == 1 %}
             <div class="guest_cart fr">
-                <a href="#" class="cart_name fl">我的购物车</a>
-                <div class="goods_count fl" id="show_count">1</div>
+                <a href="/cart" class="cart_name fl">我的购物车</a>
+                <div class="goods_count fl" id="show_count"></div>
             </div>
         {% endif %}
 	</div>

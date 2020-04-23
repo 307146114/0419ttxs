@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('gtitle', models.CharField(db_column='标题', max_length=20, verbose_name='商品名称')),
                 ('gpic', models.ImageField(db_column='图片位置', upload_to='df_goods', verbose_name='商品图片')),
                 ('gprice', models.DecimalField(db_column='价格', decimal_places=2, max_digits=5, verbose_name='商品价格')),
-                ('gunit', models.CharField(db_column='党委', default='500g', max_length=20, verbose_name='商品单位')),
+                ('gunit', models.CharField(db_column='单位', default='500g', max_length=20, verbose_name='商品单位')),
                 ('gclick', models.IntegerField(db_column='点击数量', verbose_name='点击量')),
                 ('isDelete', models.BooleanField(db_column='是否删除', default=False, verbose_name='是否删除')),
                 ('gjianjie', tinymce.models.HTMLField(db_column='简介', verbose_name='简介')),

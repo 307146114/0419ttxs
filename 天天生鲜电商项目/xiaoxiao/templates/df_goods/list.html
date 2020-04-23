@@ -51,9 +51,9 @@
 
 		<div class="r_wrap fr clearfix">
 			<div class="sort_bar">
-				<a href="#" class="active">默认</a>
-				<a href="#">价格</a>
-				<a href="#">人气</a>
+				<a href="list" class="active">默认</a>
+				<a href="list?type=1">价格</a>
+				<a href="list?type=2">人气</a>
 			</div>
             <ul class="goods_type_list clearfix">
                 {% for foo in page %}
@@ -61,9 +61,9 @@
                         <a href="/detail?goods_id={{ foo.id }}"><img src="/static/{{ foo.gpic }}"></a>
                         <h4><a href="/detail?goods_id={{ foo.id }}">{{ foo.gtitle }}</a></h4>
                         <div class="operate">
-                            <span class="prize">￥{{ foo.gprize }}</span>
-                            <span class="unit">{{ foo.gprize }}/{{ foo.gunit }}</span>
-                            <a href="#" class="add_goods" title="加入购物车"></a>
+                            <span class="prize">￥{{ foo.gprice }}</span>
+                            <span class="unit">{{ foo.gprice }}/{{ foo.gunit }}</span>
+                            <a href="#" class="add_goods" title="加入购物车" id="{{ foo.id }}"></a>
                         </div>
                     </li>
 
@@ -74,6 +74,26 @@
             <script src="/static/js/jquery-1.12.4.min.js"></script>
             <script>
                 $(function () {
+                    $(".sort_bar a").each(function (i) {
+                        if (i=={{ type }}){
+                            $(this).prop('class','active')
+                        }else{
+                            $(this).removeAttr("class")
+                        }
+                    })
+
+                    $(".sort_bar a").click(function () {
+                        $(this).prop('class','active').siblings().removeAttr("class")
+                    })
+
+                    $(".add_goods").click(function () {
+                        var id = $(this).prop('id')
+                        $.get('/cart/add?goods_id='+id,function (data) {
+                            if (data ="ok"){
+                                getcount();
+                            }
+                        })
+                    })
                     {#当前页数#}
                     var page_num ={{ page.number }};
                     {#上一页的页码#}
@@ -88,22 +108,21 @@
                     if (page_num==1){
                         $('#page_up').attr("href","#");
                     }else{
-                        $('#page_up').attr("href","/list?goodsStype="+goodsStype+"&page_num="+up_page);
+                        $('#page_up').attr("href","/list?goodsStype="+goodsStype+"&page_num="+up_page+"&type="+{{ type }});
                     }
                     if (page_num == total_page ){
                         $('#page_down').attr("href","#")
                     }else {
-                         $('#page_down').attr("href","/list?goodsStype="+goodsStype+"&page_num="+down_page);
+                         $('#page_down').attr("href","/list?goodsStype="+goodsStype+"&page_num="+down_page+"&type="+{{ type }});
                     }
                     if (total_page>5){
                         if (page_num>3){
-                            var a_text = "/list?goodsStype="+goodsStype+"&page_num=1"
+                            var a_text = "/list?goodsStype="+goodsStype+"&page_num=1"+"&type="+{{ type }}
 
-                             {#<a href='/list?goodsStype='+goodsStype+'&page_num="1"'>首页</a>#}
                             $('#page_up').before("<a href='"+a_text+"'>首页</a>")
                         }
                         if (page_num+2<total_page){
-                            var a_text = "/list?goodsStype="+goodsStype+"&page_num="+total_page
+                            var a_text = "/list?goodsStype="+goodsStype+"&page_num="+total_page+"&type="+{{ type }}
 
                             $('#page_down').after("<a href='"+a_text+"'>尾页</a>")
                         }
@@ -117,7 +136,7 @@
                         {% if forloop.counter == page.number %}
                             <a href="#" class="active">{{ page_num}}</a>
                         {% endif %}
-                        <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                        <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}&type={{ type }}" class="active">{{ page_num}}</a>
                     {% endfor %}
                 {% else %}
                     {% for page_num in page_list %}
@@ -125,16 +144,16 @@
                             <a href="#" class="active">{{ page_num}}</a>
                         {% endif %}
                         {% if forloop.counter == page.number|add:2 %}
-                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}&type={{ type }}" class="active">{{ page_num}}</a>
                         {% endif %}
                         {% if forloop.counter == page.number|add:1 %}
-                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}&type={{ type }}" class="active">{{ page_num}}</a>
                         {% endif %}
                         {% if forloop.counter == page.number|add:-1 %}
-                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}&type={{ type }}" class="active">{{ page_num}}</a>
                         {% endif %}
                         {% if forloop.counter == page.number|add:-2 %}
-                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}" class="active">{{ page_num}}</a>
+                            <a href="/list?goodsStype={{ goodsStype }}&page_num={{ page_num}}&type={{ type }}" class="active">{{ page_num}}</a>
                         {% endif %}
                     {% endfor %}
                 {% endif %}
