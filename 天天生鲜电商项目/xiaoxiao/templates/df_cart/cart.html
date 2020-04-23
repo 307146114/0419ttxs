@@ -1,55 +1,84 @@
 {% extends 'base.html' %}
 {% block head %}
     <script>
+        {# 获取当前所有购物车的数据   #}
         function settotal(){
+            {#总共价格---选中的购物车#}
             var total = 0
+            {#选中购物城的条数#}
             var total_count = 0
+            {#遍历所有购物车数据#}
             $('.cart_list_td').each(function (i) {
                 if ($(this).find('.col01 input').prop('checked')){
+                    {#当前购物车为选中状态#}
+                    {#获取获取价格#}
                     let price = $(this).find('.col05 em').text();
+                    {#获取数量#}
                     let count = $(this).find('.col06 .num_show').val();
+                    {#获取当前购车价值#}
                     let jiage = price*count
+                    {#将当前购物车条数计入总价值中#}
                     total = total+jiage;
+                    {#设置当条购车数据的价值#}
                     $(this).find('.col07').text(jiage.toFixed(2)+"元");
+                    {#选中的购物车条数+1#}
                     total_count = total_count+1
                 }
 
             })
+            {#设置所有选中的购物条数，和价值#}
             $(".settlements .col03 em").text(total.toFixed(2)+'元').next().next().text(total_count);
         }
         $(function () {
+            {#页面加载完毕后，首先遍历所有购物车条数的数据，默认所有购物车的商品都为选中状态#}
             settotal()
             {#购物车数量加1#}
             $(".add").click(function () {
+                {#获取当钱购物车的商品数量#}
                 let count = $(this).next().val();
+                {#当属数量不等于99时自动+1,99后不予以处理#}
                 if (count!=99){
                     $(this).next().val(parseInt(count)+1);
+                    {#当用当条购物车商品数量框失去焦点调用的方法#}
                     $(this).next().blur();
                 }
             })
             {#购物车数量减1#}
             $(".minus").click(function () {
+                {#获取当钱购物车的商品数量#}
                 let count = $(this).prev().val();
+                {#当属数量等1时不予以处理,大于1时自动减1#}
                 if (count==1){
                     $(this).prev().val(parseInt(count));
                 }else {
                     $(this).prev().val(parseInt(count)-1);
+                    {#当用当条购物车商品数量框失去焦点调用的方法#}
                     $(this).prev().blur();
                 }
             })
-            {#直接修改购车数量#}
+            {#直接修改购车数量后，失去焦点时调用，同时在默认+1或减1时同时调用该方法#}
             $('.num_show').blur(function () {
+                {#获取当钱购物车的商品数量#}
                 let count = $(this).val()
-                if(isNaN(parseInt(count)) || count>99){
+                {#当前数量框输入的不是数字，或是数量大于99 或是数量小于0 不予以处理，并且弹出相应说明，并回复至修改钱数值#}
+                if(isNaN(parseInt(count)) || count>99 || count<=0){
                     $(this).val($(this).prop('id'))
-                    alert("请输入正确数量(0~99)")
+                    alert("请输入正确数量(1~99)")
 
                 }else{
+                    {#当上述条件不存在，执行#}
+                    {#获取当前购物车信息的id#}
                     let cartid = $(this).prev().attr("id")
+                    {#使用ajax将该条修改信息传送至后台处理#}
                     $.get('/cart/update?cartid='+cartid+"&count="+count,function (data) {
+                        {#后台传回修改成功的信息#}
                         if (data == "ok"){
-                            settotal()
+                            {#再次更行所有购物车信息#}
+                            settotal();
+                            {#并重新再当前数量框的id上绑定，当前数量值，方便下次修改#}
+                            $(this).prop('id',count)
                         }else{
+                            {#否则。数量回复原值#}
                             $(this).val($(this).prop('id'))
                         }
                     })
@@ -58,12 +87,16 @@
             })
             {# 删除#}
             $('.delede_cart').click(function () {
+                {#保存当前的删除标签----方便后面使用当前标签寻找列表信息，便于删除#}
                 let $delede_cart=$(this)
+                {#获取要删除的购物车信息的id#}
                 let cartid = $(this).prop("id");
+                {#使用ajax删除#}
                 $.get('/cart/delete?cartid='+cartid,function (data) {
-                     alert(data)
                      if (data == "ok"){
+                        {# 删除成功收，选中删除标签的--父级（li）--父级（ul）直接删除#}
                         $delede_cart.parent().parent().remove()
+                         {#重新遍历所有购物车信息---可能所有选中的总条数和总价值会发生变化#}
                         settotal()
                      }
                 })
@@ -74,9 +107,11 @@
             })
             {#全选，取消#}
             $(".settlements .col01 input").click(function () {
-
+                {#获取全选框的当前选中的状态#}
                 let static = $(this).prop('checked');
+                 {#遍历所有的购物车信息#}
                  $('.cart_list_td').each(function (i) {
+                     {#将每条的状态设置与全框状态保持一直#}
                      $(this).find('.col01 input').prop("checked",static)
                  })
                 settotal()
@@ -85,17 +120,17 @@
             {#单挑购物车信息，选中或取消 与全选框的关系#}
             $(":checkbox:not(.settlements .col01 input)").click(function () {
                 if ($(this).prop('checked')){
+                    {#当前框的状态未选中状态时。判断所有的购物车信息是否全部选中--选中的数量===所有条数#}
                     if ($(':checked').length ==$(':checkbox:not(.settlements .col01 input)').length){
                         {#当除全选框全部选中，就勾选全选框#}
                         $('.settlements .col01 input').prop('checked',true);
                     }
                 }else{
+                    {#当单挑购物车信息的处于未选中状态，设置全选框为未选中状态#}
                     $('.settlements .col01 input').prop('checked',false);
                 }
                 settotal()
             })
-
-
         })
     </script>
 {% endblock head %}

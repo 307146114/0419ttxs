@@ -62,23 +62,32 @@ def detail(request):
             'titile': '天天生鲜 - ' + goods.gtitle,
             'goods': goods,
         }
+        # 设置返回的模板
         red = render(request, 'df_goods/detail.html', context)
+        # 获取cookies中存储最近浏览的信息，默认‘’
         goods_ids = request.COOKIES.get("goods_ids", "")
         if goods_ids != "":
+            # 当已存在浏览信息 处理
+            # 使用，分割当前字符串
             goods_id_list = goods_ids.split(",")
+            # 判断当前浏览的页面是否已经存在
             if goods_id_list.count(str(goods.id))>=1:
+                # 存在，则删除
                 goods_id_list.remove(str(goods.id))
+            #     将当前浏览的信息的加入当前结合的最前面
             goods_id_list.insert(0,str(goods.id))
+            # 判断当前信息是否大于5条，大于则只保存最新的5条
             if len(goods_id_list)>=6:
                 del goods_id_list[5]
-
-            print(goods_id_list)
+            # 设置最近访问网页的cookies
             red.set_cookie("goods_ids", ','.join(goods_id_list))
             return red
         else:
+            # 若是第一次保存最近访问，直接设置
             red.set_cookie("goods_ids",goods.id)
             return red
     except Exception:
+        # 数据库为查询到或其他非法信息，直接删除
         return HttpResponseRedirect("/")
 def list(request):
     # 商品列表
