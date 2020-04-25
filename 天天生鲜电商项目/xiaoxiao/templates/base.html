@@ -63,8 +63,10 @@
         {% endif %}
 
 		<div class="search_con fl">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
+            <form action="/search/">
+                <input type="text" class="input_text fl" name="q" placeholder="搜索商品">
+			<input type="submit" class="input_btn fr" name="" value="搜索">
+            </form>
 		</div>
         {% if pagetype|default:'' == 1 %}
             <div class="guest_cart fr">

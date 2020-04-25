@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'df_cart',
     #  订单模块
     'df_order',
+    # 全文检索
+    'haystack',
 ]
 
 MIDDLEWARE = [
@@ -130,15 +132,28 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-
+# 设置静态文件路径
 STATIC_URL = '/static/'
 STATICFILES_DIRS=[
     os.path.join(BASE_DIR,'static')
 ]
+# 设置上传文件的路径
 MEDIA_ROOT = os.path.join(BASE_DIR,'static')
-
+# 配置富文本编辑器
 TINYMCE_DEFAULT_CONFIG = {
     'theme': "silver",
     'width': 600,
     'height': 400,
 }
+# 设置全文检索
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',#从环境中引用
+        'ENGINE': 'df_goods.whoosh_cn_backend.WhooshEngine',#从本地引用
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    }
+}
+#自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+# 设置每页显示的个数
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 15
