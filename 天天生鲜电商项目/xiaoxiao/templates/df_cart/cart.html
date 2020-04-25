@@ -1,34 +1,55 @@
 {% extends 'base.html' %}
 {% block head %}
     <script>
+        {#总共价格---选中的购物车#}
+        var total = 0;
+        {#选中购物城的条数#}
+        var total_count = 0;
+        {#最后结算的链接#}
+        var herf = "";
+        var reay = true;
         {# 获取当前所有购物车的数据   #}
-        function settotal(){
+        function settotal() {
             {#总共价格---选中的购物车#}
-            var total = 0
+            total = 0;
             {#选中购物城的条数#}
-            var total_count = 0
+            total_count = 0;
+            {#最后结算的链接#}
+            herf = "/order";
             {#遍历所有购物车数据#}
             $('.cart_list_td').each(function (i) {
-                if ($(this).find('.col01 input').prop('checked')){
+                if ($(this).find('.col01 input').prop('checked')) {
                     {#当前购物车为选中状态#}
                     {#获取获取价格#}
                     let price = $(this).find('.col05 em').text();
                     {#获取数量#}
                     let count = $(this).find('.col06 .num_show').val();
                     {#获取当前购车价值#}
-                    let jiage = price*count
+                    let jiage = price * count;
                     {#将当前购物车条数计入总价值中#}
-                    total = total+jiage;
+                    total = total + jiage;
                     {#设置当条购车数据的价值#}
-                    $(this).find('.col07').text(jiage.toFixed(2)+"元");
+                    $(this).find('.col07').text(jiage.toFixed(2) + "元");
                     {#选中的购物车条数+1#}
-                    total_count = total_count+1
+                    if (total_count == 0) {
+                        herf = herf + "?cartid=" + $(this).find('.col06 .add').prop("id");
+                    } else {
+                        herf = herf + "&cartid=" + $(this).find('.col06 .add').prop("id");
+                    }
+                    total_count = total_count + 1;
                 }
 
             })
             {#设置所有选中的购物条数，和价值#}
-            $(".settlements .col03 em").text(total.toFixed(2)+'元').next().next().text(total_count);
+            $(".settlements .col03 em").text(total.toFixed(2) + '元').next().next().text(total_count);
+            if (total_count == 0) {
+                $(".settlements .col04 a").prop('href', '#');
+            } else {
+                $(".settlements .col04 a").prop('href', herf);
+            }
+
         }
+
         $(function () {
             {#页面加载完毕后，首先遍历所有购物车条数的数据，默认所有购物车的商品都为选中状态#}
             settotal()
@@ -37,8 +58,8 @@
                 {#获取当钱购物车的商品数量#}
                 let count = $(this).next().val();
                 {#当属数量不等于99时自动+1,99后不予以处理#}
-                if (count!=99){
-                    $(this).next().val(parseInt(count)+1);
+                if (count != 99) {
+                    $(this).next().val(parseInt(count) + 1);
                     {#当用当条购物车商品数量框失去焦点调用的方法#}
                     $(this).next().blur();
                 }
@@ -48,133 +69,168 @@
                 {#获取当钱购物车的商品数量#}
                 let count = $(this).prev().val();
                 {#当属数量等1时不予以处理,大于1时自动减1#}
-                if (count==1){
+                if (count == 1) {
                     $(this).prev().val(parseInt(count));
-                }else {
-                    $(this).prev().val(parseInt(count)-1);
+                } else {
+                    $(this).prev().val(parseInt(count) - 1);
                     {#当用当条购物车商品数量框失去焦点调用的方法#}
                     $(this).prev().blur();
                 }
             })
             {#直接修改购车数量后，失去焦点时调用，同时在默认+1或减1时同时调用该方法#}
             $('.num_show').blur(function () {
-                {#获取当钱购物车的商品数量#}
-                let count = $(this).val()
-                {#当前数量框输入的不是数字，或是数量大于99 或是数量小于0 不予以处理，并且弹出相应说明，并回复至修改钱数值#}
-                if(isNaN(parseInt(count)) || count>99 || count<=0){
-                    $(this).val($(this).prop('id'))
-                    alert("请输入正确数量(1~99)")
-
-                }else{
-                    {#当上述条件不存在，执行#}
                     {#获取当前购物车信息的id#}
-                    let cartid = $(this).prev().attr("id")
-                    {#使用ajax将该条修改信息传送至后台处理#}
-                    $.get('/cart/update?cartid='+cartid+"&count="+count,function (data) {
-                        {#后台传回修改成功的信息#}
-                        if (data == "ok"){
-                            {#再次更行所有购物车信息#}
-                            settotal();
-                            {#并重新再当前数量框的id上绑定，当前数量值，方便下次修改#}
-                            $(this).prop('id',count)
-                        }else{
-                            {#否则。数量回复原值#}
-                            $(this).val($(this).prop('id'))
+                    let cartid = $(this).prev().attr("id");
+                    {#获取当钱购物车的商品数量#}
+                    let count = $(this).val();
+                    let name = $(this).parent().parent().siblings('.col03').attr('qq');
+                    {#获取当前商品库存---使用同步方法判断，方便在提交购物车信息时验证是否跳转#}
+                    $.ajax({
+                        url: '/cart/kucun?cartid=' + cartid,
+                        async: false,
+                        success:function (kucun) {
+
+                            {#当前数量框输入的不是数字，或是数量大于99 或是数量小于0 不予以处理，并且弹出相应说明，并回复至修改钱数值#}
+                             if (isNaN(parseInt(count)) || count > 99 || count <= 0) {
+                                $(this).val($(this).prop('id'));
+                                alert("商品:" + name + "请输入正确数量(1~99)");
+                                reay = false;
+                            } else if (count > kucun) {
+
+                                $(this).val($(this).prop('id'));
+                                alert("商品:" + name + ":库存不足");
+                                reay = false;
+                            } else {
+                                  {#当上述条件不存在，执行#}
+                                  {#使用ajax将该条修改信息传送至后台处理#}
+                                 if ($(this).prop.val() != count){
+                                     $.get('/cart/update?cartid=' + cartid + "&count=" + count, function (data) {
+                                          {#后台传回修改成功的信息#}
+                                           if (data == "ok") {
+                                                {#再次更行所有购物车信息#}
+                                                settotal();
+                                                {#并重新再当前数量框的id上绑定，当前数量值，方便下次修改#}
+                                                $(this).prop('id', count)
+                                           } else{
+                                               {#否则。数量回复原值#}
+                                                $(this).val($(this).prop('id'))
+                                           }
+                                     })
+                                 }
+
+                            }
                         }
-                    })
 
+                    });
+
+            })
+        {# 删除#}
+        $('.delede_cart').click(function () {
+            {#保存当前的删除标签----方便后面使用当前标签寻找列表信息，便于删除#}
+            let $delede_cart = $(this)
+            {#获取要删除的购物车信息的id#}
+            let cartid = $(this).prop("id");
+            {#使用ajax删除#}
+            $.get('/cart/delete?cartid=' + cartid, function (data) {
+                if (data == "ok") {
+                    {# 删除成功收，选中删除标签的--父级（li）--父级（ul）直接删除#}
+                    $delede_cart.parent().parent().remove()
+                    {#重新遍历所有购物车信息---可能所有选中的总条数和总价值会发生变化#}
+                    settotal()
                 }
             })
-            {# 删除#}
-            $('.delede_cart').click(function () {
-                {#保存当前的删除标签----方便后面使用当前标签寻找列表信息，便于删除#}
-                let $delede_cart=$(this)
-                {#获取要删除的购物车信息的id#}
-                let cartid = $(this).prop("id");
-                {#使用ajax删除#}
-                $.get('/cart/delete?cartid='+cartid,function (data) {
-                     if (data == "ok"){
-                        {# 删除成功收，选中删除标签的--父级（li）--父级（ul）直接删除#}
-                        $delede_cart.parent().parent().remove()
-                         {#重新遍历所有购物车信息---可能所有选中的总条数和总价值会发生变化#}
-                        settotal()
-                     }
-                })
-                {% comment %}
-
-                 $(this).parent().parent().remove()
-                {% endcomment %}
+        })
+        {#全选，取消#}
+        $(".settlements .col01 input").click(function () {
+            {#获取全选框的当前选中的状态#}
+            let static = $(this).prop('checked');
+            {#遍历所有的购物车信息#}
+            $('.cart_list_td').each(function (i) {
+                {#将每条的状态设置与全框状态保持一直#}
+                $(this).find('.col01 input').prop("checked", static)
             })
-            {#全选，取消#}
-            $(".settlements .col01 input").click(function () {
-                {#获取全选框的当前选中的状态#}
-                let static = $(this).prop('checked');
-                 {#遍历所有的购物车信息#}
-                 $('.cart_list_td').each(function (i) {
-                     {#将每条的状态设置与全框状态保持一直#}
-                     $(this).find('.col01 input').prop("checked",static)
-                 })
-                settotal()
+            settotal()
 
-            })
-            {#单挑购物车信息，选中或取消 与全选框的关系#}
-            $(":checkbox:not(.settlements .col01 input)").click(function () {
-                if ($(this).prop('checked')){
-                    {#当前框的状态未选中状态时。判断所有的购物车信息是否全部选中--选中的数量===所有条数#}
-                    if ($(':checked').length ==$(':checkbox:not(.settlements .col01 input)').length){
-                        {#当除全选框全部选中，就勾选全选框#}
-                        $('.settlements .col01 input').prop('checked',true);
-                    }
-                }else{
-                    {#当单挑购物车信息的处于未选中状态，设置全选框为未选中状态#}
-                    $('.settlements .col01 input').prop('checked',false);
+        })
+        {#单挑购物车信息，选中或取消 与全选框的关系#}
+        $(":checkbox:not(.settlements .col01 input)").click(function () {
+            if ($(this).prop('checked')) {
+                {#当前框的状态未选中状态时。判断所有的购物车信息是否全部选中--选中的数量===所有条数#}
+                if ($(':checked').length == $(':checkbox:not(.settlements .col01 input)').length) {
+                    {#当除全选框全部选中，就勾选全选框#}
+                    $('.settlements .col01 input').prop('checked', true);
                 }
-                settotal()
+            } else {
+                {#当单挑购物车信息的处于未选中状态，设置全选框为未选中状态#}
+                $('.settlements .col01 input').prop('checked', false);
+            }
+            settotal()
+        })
+        $(".settlements .col04 a").click(function (event) {
+            if (total_count == 0) {
+                alert("没有选中购买的商品就不要提交了。。。。☺☺☺☺☺")
+            }
+
+        })
+        $("#place_order").click(function () {
+            reay =true
+            $(':checked:not(.settlements .col01 input)').parent().siblings(".col06").find(".num_show").each(function () {
+                $(this).blur();
+                if (!reay){
+                    event.preventDefault();
+                    return;
+                }
+
+
             })
+
+        })
         })
     </script>
 {% endblock head %}
 
 {% block bodytop %}
-	<div class="total_count">全部商品<em>2</em>件</div>	
-	<ul class="cart_list_th clearfix">
-		<li class="col01">商品名称</li>
-		<li class="col02">商品单位</li>
-		<li class="col03">商品价格</li>
-		<li class="col04">数量</li>
-		<li class="col05">小计</li>
-		<li class="col06">操作</li>
-	</ul>
+    <div class="total_count">全部商品<em>{{ count }}</em>件</div>
+    <ul class="cart_list_th clearfix">
+        <li class="col01">商品名称</li>
+        <li class="col02">商品单位</li>
+        <li class="col03">商品价格</li>
+        <li class="col04">数量</li>
+        <li class="col05">小计</li>
+        <li class="col06">操作</li>
+    </ul>
     {% for cart in list %}
         <ul class="cart_list_td clearfix">
-		<li class="col01"><input type="checkbox" name="" checked></li>
-		<li class="col02"><img src="/static/{{ cart.goods.gpic }}"></li>
-		<li class="col03">{{ cart.goods.gtitle }}<br><em>{{ cart.goods.gprice }}元/{{ cart.goods.gunit }}</em></li>
-		<li class="col04">{{ cart.goods.gunit }}</li>
+            <li class="col01"><input type="checkbox" name="" checked></li>
+            <li class="col02"><img src="/static/{{ cart.goods.gpic }}"></li>
+            <li class="col03"
+                qq="{{ cart.goods.gtitle }}">{{ cart.goods.gtitle }}<br><em>{{ cart.goods.gprice }}元/{{ cart.goods.gunit }}</em>
+            </li>
+            <li class="col04">{{ cart.goods.gunit }}</li>
             <li class="col05"><em>{{ cart.goods.gprice }}</em>元</li>
-		<li class="col06">
-			<div class="num_add">
-				<a href="javascript:;" class="add fl" id="{{ cart.id }}">+</a>
-				<input type="text" class="num_show fl" value="{{ cart.count }}"
-                id="{{ cart.count }}">
-				<a href="javascript:;" class="minus fl" id="{{ cart.id }}">-</a>
-			</div>
-		</li>
-		<li class="col07">25.80元</li>
-		<li class="col08"><a href="javascript:;" class="delede_cart" id="{{ cart.id }}">删除</a></li>
-	</ul>
+            <li class="col06">
+                <div class="num_add">
+                    <a href="javascript:;" class="add fl" id="{{ cart.id }}">+</a>
+                    <input type="text" class="num_show fl" value="{{ cart.count }}"
+                           id="{{ cart.count }}">
+                    <a href="javascript:;" class="minus fl" id="{{ cart.id }}">-</a>
+                </div>
+            </li>
+            <li class="col07">25.80元</li>
+            <li class="col08"><a href="javascript:;" class="delede_cart" id="{{ cart.id }}">删除</a></li>
+        </ul>
     {% endfor %}
 
 
 
 
-	
 
-	<ul class="settlements">
-		<li class="col01"><input type="checkbox" name="" checked=""></li>
-		<li class="col02">全选</li>
-		<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
-		<li class="col04"><a href="place_order.html">去结算</a></li>
-	</ul>
+
+    <ul class="settlements">
+        <li class="col01"><input type="checkbox" name="" checked=""></li>
+        <li class="col02">全选</li>
+        <li class="col03">合计(不含运费)：<span>¥</span><em></em><br>共计<b></b>件商品</li>
+        <li class="col04"><a id="place_order">去结算</a></li>
+    </ul>
 
 {% endblock bodytop %}

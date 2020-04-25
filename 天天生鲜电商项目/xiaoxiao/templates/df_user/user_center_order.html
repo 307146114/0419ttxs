@@ -1,4 +1,55 @@
 {% extends "df_user/../base.html" %}
+{% block head %}
+    <script src="/static/js/jquery-1.12.4.min.js"></script>
+            <script>
+                $(function () {
+                    {#当前页数#}
+                    var page_num ={{ page.number }};
+                    {#上一页的页码#}
+                    var up_page = parseInt(page_num)-1;
+                    {#下一页的页码#}
+                    var down_page = parseInt(page_num)+1;
+                    {#下一页的页码#}
+                    {#总页数#}
+                    var total_page = {{ page.paginator.num_pages }};
+                    if (page_num==1){
+                        $('#page_up').attr("href","#");
+                    }else{
+                        $('#page_up').attr("href","/user/user_center_order?page_num="+up_page);
+                    }
+                    if (page_num == total_page ){
+                        $('#page_down').attr("href","#")
+                    }else {
+                         $('#page_down').attr("href","/user/user_center_order?page_num="+down_page);
+                    }
+                    if (total_page>5){
+                        if (page_num>3){
+                            var a_text = "/user/user_center_order?page_num=1"
+
+                            $('#page_up').before("<a href='"+a_text+"'>首页</a>")
+                        }
+                        if (page_num+2<total_page){
+                            var a_text = "/user/user_center_order?page_num="+total_page
+
+                            $('#page_down').after("<a href='"+a_text+"'>尾页</a>")
+                        }
+                    }
+
+
+                    $('.order_list_table').each(function () {
+                        let total = 0
+                        $(this).find('.order_goods_list').each(function (i) {
+                            let count = $(this).find('.col03').text();
+                            let price = $(this).find('.col02').prop('id');
+                            let jiazhi = count*price;
+                            total = total+jiazhi;
+                            $(this).find('.col04 em').text(jiazhi.toFixed(2));
+                        })
+                         $(this).find('td:eq(1)').text(total.toFixed(2)+'元');
+                    })
+                })
+            </script>
+{% endblock head %}
 {% block bodytop %}
     <div class="main_con clearfix">
 		<div class="left_menu_con clearfix">
@@ -11,74 +62,87 @@
 		</div>
 		<div class="right_content clearfix">
 				<h3 class="common_title2">全部订单</h3>
-				<ul class="order_list_th w978 clearfix">
-					<li class="col01">2016-8-21 17:36:24</li>
-					<li class="col02">订单号：56872934</li>
-					<li class="col02 stress">未支付</li>		
+                {% for order in page %}
+                    <ul class="order_list_th w978 clearfix">
+					<li class="col01">{{ order.oDate}}</li>
+					<li class="col02">订单号：{{ order.id }}</li>
+					<li class="col02 stress">
+                        {% if order.oIsPay %}
+                            支付成功
+                        {% else %}
+                            未支付
+                        {% endif %}
+                    </li>
 				</ul>
 
 				<table class="order_list_table w980">
 					<tbody>
-						<tr>
-							<td width="55%">
-								<ul class="order_goods_list clearfix">					
-									<li class="col01"><img src="/static/images/goods02.jpg"></li>
-									<li class="col02">嘎啦苹果嘎啦苹果<em>11.80元/500g</em></li>	
-									<li class="col03">1</li>
-									<li class="col04">11.80元</li>	
-								</ul>
-								<ul class="order_goods_list clearfix">					
-									<li class="col01"><img src="/static/images/goods02.jpg"></li>
-									<li class="col02">嘎啦苹果嘎啦苹果<em>11.80元/500g</em></li>	
-									<li class="col03">1</li>
-									<li class="col04">11.80元</li>	
-								</ul>
-							</td>
-							<td width="15%">33.60元</td>
-							<td width="15%">待付款</td>
-							<td width="15%"><a href="#" class="oper_btn">去付款</a></td>
-						</tr>
-					</tbody>
-				</table>
-				
-				<ul class="order_list_th w978 clearfix">
-					<li class="col01">2016-8-21 17:36:24</li>
-					<li class="col02">订单号：56872934</li>
-					<li class="col02 stress">已支付</li>			
-				</ul>
-				<table class="order_list_table w980">
-					<tbody>
-						<tr>
-							<td width="55%">
-								<ul class="order_goods_list clearfix">					
-									<li class="col01"><img src="/static/images/goods02.jpg"></li>
-									<li class="col02">嘎啦苹果嘎啦苹果<em>11.80元/500g</em></li>	
-									<li class="col03">1</li>
-									<li class="col04">11.80元</li>	
-								</ul>
-								<ul class="order_goods_list clearfix">					
-									<li class="col01"><img src="/static/images/goods02.jpg"></li>
-									<li class="col02">嘎啦苹果嘎啦苹果<em>11.80元/500g</em></li>	
-									<li class="col03">1</li>
-									<li class="col04">11.80元</li>	
-								</ul>
-							</td>
-							<td width="15%">33.60元</td>
-							<td width="15%">已付款</td>
-							<td width="15%"><a href="#" class="oper_btn">查看物流</a></td>
-						</tr>
-					</tbody>
-				</table>
+                        <tr>
+                            <td width="55%">
+                                {% for orderdetail in order.orderdetailinfo_set.all %}
+                                    <ul class="order_goods_list clearfix">
+                                        <li class="col01"><img src="/static/{{ orderdetail.goods.gpic}}"></li>
+                                        <li class="col02" id="{{ orderdetail.price}}">{{ orderdetail.goods.gtitle}}<em>{{ orderdetail.price}}元/{{ orderdetail.goods.gunit}}</em></li>
+                                        <li class="col03">{{ orderdetail.count }}</li>
+                                        <li class="col04"><em></em>元</li>
+                                    </ul>
+                                {% endfor %}
+                            </td>
+                            <td width="15%">33.60元</td>
+                            <td width="15%">
+                                {% if order.oIsPay %}
+                                    支付成功
+                                {% else %}
+                                    未支付
+                                {% endif %}
 
-				<div class="pagenation">
-					<a href="#"><上一页</a>
-					<a href="#" class="active">1</a>
-					<a href="#">2</a>
-					<a href="#">3</a>
-					<a href="#">4</a>
-					<a href="#">5</a>
-					<a href="#">下一页></a>
-				</div>
+                            </td>
+                            <td width="15%">
+                                {% if order.oIsPay %}
+                                    <a href="#" class="oper_btn">付款成功</a>
+                                {% else %}
+                                    <a href="#" class="oper_btn">去付款</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                    </table>
+                {% endfor %}
+
+            <div class="pagenation">
+				<a href="#" id="page_up"><上一页</a>
+                {#设置分页---当总页小于等于5直接显示#}
+                {% if  page.paginator.num_pages <= 5 %}
+                    {% for page_num in page_list %}
+                        {% if forloop.counter == page.number %}
+                            <a href="#" class="active">{{ page_num}}</a>
+                        {% else %}
+                            <a href="/user/user_center_order?page_num={{ page_num}}" >{{ page_num}}</a>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {#设置分页---当总页大于5直接显示#}
+                    {% for page_num in page_list %}
+                        {% if forloop.counter == page.number %}
+                            {#当前页设置成选中状态#}
+                            <a href="#" class="active">{{ page_num}}</a>
+                        {% endif %}
+                        {% if forloop.counter == page.number|add:2 %}
+                            <a href="/user/user_center_order?page_num={{ page_num}}" >{{ page_num}}</a>
+                        {% endif %}
+                        {% if forloop.counter == page.number|add:1 %}
+                            <a href="/user/user_center_order?page_num={{ page_num}}" >{{ page_num}}</a>
+                        {% endif %}
+                        {% if forloop.counter == page.number|add:-1 %}
+                            <a href="/user/user_center_order?page_num={{ page_num}}" >{{ page_num}}</a>
+                        {% endif %}
+                        {% if forloop.counter == page.number|add:-2 %}
+                            <a href="/user/user_center_order?page_num={{ page_num}}" >{{ page_num}}</a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+				<a href="#" id="page_down">下一页></a>
+			</div>
 		</div>
 	</div>
 

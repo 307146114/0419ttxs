@@ -94,7 +94,7 @@ def list(request):
     # 获取排列排列顺序
     type = request.GET.get("type", 0)
     # 获取物品类别id
-    goodsStype = request.GET.get("goodsStype", 1)
+    goodsStype = request.GET.get("goodstype", 1)
     # 获取要显示页码
     page_num = request.GET.get("page_num", 1)
     # 根据类别id获取类别对象
@@ -111,8 +111,7 @@ def list(request):
         goods_list = type_info.goodsinfo_set.all()
     # goods_list = type_info.goodsinfo_set.all()
     # 分页，每页显示15个对象
-    # paginator = Paginator(goods_list, 15)
-    paginator = Paginator(goods_list, 1)
+    paginator = Paginator(goods_list, 15)
     # 显示第N页的数据
     page = paginator.page(page_num)
     # 获取页码的结合
@@ -124,5 +123,7 @@ def list(request):
         'page_list':page_list,
         "goodsStype":type_info.id,
         "type":type,
+        "typename":type_info.ttitle
     }
     return render(request, 'df_goods/list.html', context)
+

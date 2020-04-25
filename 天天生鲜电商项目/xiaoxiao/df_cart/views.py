@@ -17,7 +17,18 @@ def cart(request):
     else:
         # 没有找到返回空集合
         context['list']=[]
+    context['count']=len(cartlist)
     return  render(request,'df_cart/cart.html',context)
+def kucun(request):
+    # 获取要修改的购物车信息id
+    cartId = request.GET.get("cartid", 0)
+    if int(cartId) > 0:
+        carts = CartInfo.objects.filter(pk=cartId)
+        if len(carts)>0:
+            kucun = carts[0].goods.gkucun
+            print(kucun)
+            return HttpResponse(kucun)
+    # return HttpResponse(0)
 
 def count(request):
     # 获取用户的购物车条数
@@ -47,12 +58,13 @@ def add(request):
              cart.save()
          else:
              # 未查询到，创建的购物车信息，保存值数据库
-             cart = CartInfo()
-             cart.user_id = userId
-             cart.goods_id = goodsid
-             cart.count = 1
-             cart.save()
-    return HttpResponse("ok")
+            cart = CartInfo()
+            cart.user_id = userId
+            cart.goods_id = goodsid
+            cart.count = 1
+            cart.save()
+         return HttpResponse("ok")
+    return HttpResponse("err")
 
 def update(request):
     # 修改购物车信息

@@ -22,11 +22,12 @@
         })
     </script>
     {% block head %}{% endblock head %}
+
 </head>
 <body>
     <div class="header_con">
 		<div class="header">
-			<div class="welcome fl">欢迎来到天天生鲜!</div>
+			<div class="welcome fl"><a href="/">欢迎来到天天生鲜!</a></div>
 			<div class="fr">
                 {% if request.session.user_name|default:"" != "" %}
                     <div class="login_btn fl">
@@ -57,12 +58,15 @@
 
 	<div class="search_bar clearfix">
 		<a href="/" class="logo fl"><img src="/static/images/logo.png"></a>
-		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
-		<div class="search_con fr">
+        {% if pagetype|default:'' == 2 %}
+            <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+        {% endif %}
+
+		<div class="search_con fl">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
 		</div>
-        {% if pagetype == 1 %}
+        {% if pagetype|default:'' == 1 %}
             <div class="guest_cart fr">
                 <a href="/cart" class="cart_name fl">我的购物车</a>
                 <div class="goods_count fl" id="show_count"></div>

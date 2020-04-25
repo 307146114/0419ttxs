@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'tinymce',
     # 购物车模块
     'df_cart',
+    #  订单模块
+    'df_order',
 ]
 
 MIDDLEWARE = [

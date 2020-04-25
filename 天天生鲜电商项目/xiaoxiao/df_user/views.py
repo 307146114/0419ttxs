@@ -4,7 +4,8 @@ from django.http import HttpResponse,HttpResponseRedirect
 from hashlib import sha1
 from . import user_decorator
 from df_goods.models import *
-
+from df_order.models import *
+from django.core.paginator import Paginator
 # Create your views here.
 
 def register(request):
@@ -87,18 +88,31 @@ def user_center_info(request):
         for goodsId in goods_ids_list:
             list.append( GoodsInfo.objects.get(pk=goodsId))
 
-    return render(request,"df_user/user_center_info.html",{'title':'天天生鲜 - 用户中心','list':list,'user':user})
+    return render(request,"df_user/user_center_info.html",{'title':'天天生鲜 - 用户中心','list':list,'user':user,'pagetype':2})
 @user_decorator.login
 def user_center_order(request):
-     # 用户订单请求页面
-     return render(request,"df_user/user_center_order.html",{'title':'天天生鲜 - 用户订单'})
+    try:
+        # 获取用户id
+        userId = request.session['user_id']
+        # 获取订单显示第几页
+        pageNum = request.GET.get('page_num', 1)
+        # 根据用户信息查询订单
+        orderlist = OrderInfo.objects.filter(oUser_id=userId).order_by('oIsPay')
+        # 设置分页
+        paginator = Paginator(orderlist,3)
+        page = paginator.page(pageNum)
+        page_list = paginator.page_range
+        # 用户订单请求页面
+        return render(request, "df_user/user_center_order.html", {'title': '天天生鲜 - 用户订单','page':page,'page_list':page_list,'pagetype':2})
+    except Exception:
+        return HttpResponseRedirect('/user/user_center_order')
 @user_decorator.login
 def user_center_site(request):
     # 修改收或地址请求页面
     uid = request.session["user_id"]
     user_Db = UserInfo.objects.filter(pk=uid)
 
-    return render(request,"df_user/user_center_site.html",{'user':user_Db[0],'title':'天天生鲜 - 收货地址'})
+    return render(request,"df_user/user_center_site.html",{'user':user_Db[0],'title':'天天生鲜 - 收货地址','pagetype':2})
 
 def editUesr(request):
     post = request.POST
