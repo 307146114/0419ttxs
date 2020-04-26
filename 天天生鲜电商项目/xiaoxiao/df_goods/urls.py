@@ -8,6 +8,6 @@ urlpatterns = [
     url(r"^list$",views.list),#商品的类别表
     # url(r'^search/', MySeachView.as_view(), name='search_view'),#2.4版本后自定义context
     url(r'^search/', MySeachView(), name='search_view'),#2.4版本前自定义context
-    # url(r'^search/', include('haystack.urls')),#商品的类别表
+    # url(r'^search/', include('haystack.urls')),#默认使用
 
 ]

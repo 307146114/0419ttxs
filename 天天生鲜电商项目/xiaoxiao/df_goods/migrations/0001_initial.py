@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('gtitle', models.CharField(db_column='标题', max_length=20, verbose_name='商品名称')),
-                ('gpic', models.ImageField(db_column='图片位置', upload_to='df_goods', verbose_name='商品图片')),
+                ('gpic', models.ImageField(db_column='图片位置', upload_to='media', verbose_name='商品图片')),
                 ('gprice', models.DecimalField(db_column='价格', decimal_places=2, max_digits=5, verbose_name='商品价格')),
                 ('gunit', models.CharField(db_column='单位', default='500g', max_length=20, verbose_name='商品单位')),
                 ('gclick', models.IntegerField(db_column='点击数量', verbose_name='点击量')),
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('gjianjie', tinymce.models.HTMLField(db_column='简介', verbose_name='简介')),
                 ('gkucun', models.IntegerField(db_column='库存', verbose_name='库存')),
                 ('gcontent', tinymce.models.HTMLField(db_column='详细情况', verbose_name='详细介绍')),
-                ('gtype', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='df_goods.TypeInfo', verbose_name='所属分类')),
+                ('gtype', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='media.TypeInfo', verbose_name='所属分类')),
             ],
             options={
                 'verbose_name': '商品信息',

@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'p7s(w!8eg(12()476yvpb%2w9dl4hiao^a)8d9jm&oyr0jkjzd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True #True
 
 ALLOWED_HOSTS = ['*']
 
@@ -134,11 +134,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 # 设置静态文件路径
 STATIC_URL = '/static/'
+STATIC_ROOT='/home/python/var/www/xiaoxiao/static'
 STATICFILES_DIRS=[
     os.path.join(BASE_DIR,'static')
 ]
 # 设置上传文件的路径
-MEDIA_ROOT = os.path.join(BASE_DIR,'static')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR,'static/media')
+MEDIA_ROOT = '/home/python/var/www/xiaoxiao/static/media'
 # 配置富文本编辑器
 TINYMCE_DEFAULT_CONFIG = {
     'theme': "silver",
@@ -148,7 +151,7 @@ TINYMCE_DEFAULT_CONFIG = {
 # 设置全文检索
 HAYSTACK_CONNECTIONS = {
     'default': {
-        # 'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',#从环境中引用
+        # 'ENGINE': 'haystack.backends.whoosh_cn_backend.WhoopyshEngine',#从环境中引用
         'ENGINE': 'df_goods.whoosh_cn_backend.WhooshEngine',#从本地引用
         'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
     }

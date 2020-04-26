@@ -14,7 +14,7 @@ class TypeInfo(models.Model):       #index首页商品分类信息
 
 class GoodsInfo(models.Model):      #商品信息
     gtitle = models.CharField('商品名称', max_length=20)
-    gpic = models.ImageField('商品图片',upload_to='df_goods')      #商品图片
+    gpic = models.ImageField('商品图片',upload_to='media')      #商品图片
     gprice = models.DecimalField('商品价格',max_digits=5, decimal_places=2)        #总共最多有7位,小数占2位
     gunit = models.CharField('商品单位',max_length=20, default='500g')     #商品的单位
     gclick = models.IntegerField('点击量')          #商品点击量,便于排人气
